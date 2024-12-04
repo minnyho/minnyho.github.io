@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Segmented Video Playback with Loop</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      height: 300vh; /* 滾動範圍 */
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .container {
+      position: sticky;
+      top: 10%; /* 影片置於滾動視窗中間 */
+      width: 90%;
+      height: 50vh;
+      overflow: hidden;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* 左右漸層遮罩 */
+    .gradient-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: linear-gradient(
+        to right,
+        black 10%, /* 左側黑色範圍 */
+        rgba(0, 0, 0, 0) 40%, /* 中間透明開始 */
+        rgba(0, 0, 0, 0) 60%, /* 中間透明結束 */
+        black 90% /* 右側黑色範圍 */
+      );
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="player"></div>
+    <div class="gradient-overlay"></div> <!-- 左右漸層效果 -->
+  </div>
+  <script>
+    let player;
+    const segments = [
+      { start: 12, end: 18 },
+      { start: 18, end: 24 },
+      { start: 26, end: 32 },
+      { start: 40, end: 47 },
+      { start: 48, end: 53 },
+      { start: 54, end: 60 },
+      { start: 61, end: 80 },
+      { start: 81, end: 88 },
+      { start: 89, end: 94 },
+      { start: 95, end: 111 }
+    ];
+    let currentSegmentIndex = 0;
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        videoId: 'GuVPc4J9qxg', // 替換為你的 YouTube 影片 ID
+        playerVars: {
+          controls: 0, // 隱藏控制介面
+          autoplay: 0, // 停止時不自動播放
+          mute: 1, // 靜音播放
+          rel: 0,
+          cc_load_policy: 0,
+          iv_load_policy: 3,
+          hl: "en"
+        },
+        events: {
+          onReady: onPlayerReady,
+        }
+      });
+    }
+
+    function onPlayerReady() {
+      playSegment(currentSegmentIndex);
+
+      window.addEventListener('scroll', () => {
+        const scrollPosition = window.scrollY;
+        const totalHeight = document.body.scrollHeight - window.innerHeight;
+
+        // 計算滾動位置對應的片段索引
+        const segmentIndex = Math.floor((scrollPosition / totalHeight) * segments.length);
+        if (segmentIndex !== currentSegmentIndex) {
+          currentSegmentIndex = segmentIndex;
+          playSegment(currentSegmentIndex);
+        }
+      });
+
+      // 定時檢查是否需要重播段落
+      setInterval(() => {
+        const segment = segments[currentSegmentIndex];
+        const currentTime = player.getCurrentTime();
+        if (currentTime >= segment.end || currentTime < segment.start) {
+          player.seekTo(segment.start, true); // 回到片段起始點
+        }
+      }, 500); // 每 500 毫秒檢查一次
+    }
+
+    function playSegment(index) {
+      const segment = segments[index];
+      if (player) {
+        player.seekTo(segment.start, true);
+        player.playVideo();
+      }
+    }
+
+    // 動態載入 YouTube IFrame API
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api%22;  
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  </script>
+</body>
+</html>
