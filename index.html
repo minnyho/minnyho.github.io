@@ -1,258 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="zh">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Product Cards</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f9f9f9;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>訂單管理</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+    }
 
-        #content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            width: 90%;
-            max-width: 1200px;
-        }
+    #content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
 
-        .product-card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: transform 0.2s;
-            position: relative;
-        }
+    .product-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
 
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
+    .progress {
+      height: 10px;
+      border-radius: 5px;
+    }
 
-        .product-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
+    .progress-bar {
+      width: 0%;
+      transition: width 1s linear;
+    }
 
-        .product-card .card-content {
-            padding: 15px;
-        }
-
-        .product-card h3 {
-            font-size: 18px;
-            margin: 0 0 10px;
-            color: #333;
-        }
-
-        .product-card p {
-            font-size: 14px;
-            color: #666;
-            margin: 0 0 15px;
-        }
-
-        .product-card .price {
-            font-size: 16px;
-            font-weight: bold;
-            color: #202020;
-            margin-bottom: 10px;
-        }
-
-        .product-card .button-container {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-        }
-
-        .product-card button {
-            padding: 8px 15px;
-            font-size: 14px;
-            border: none;
-            border-radius: 4px;
-            background-color: #353535;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-right: 5px;
-        }
-
-        .product-card button:hover {
-            background-color: #1e1e1e;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* 讓進度條占滿一點 */
-        .progress {
-            margin-top: 10px;
-        }
-    </style>
+    .completed {
+      color: green;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
 </head>
-
 <body>
-    <div id="content"></div>
 
-    <script>
-        // 點擊「接單」後的行為
-        function acceptOrder(orderId) {
-            console.log("Order accepted:", orderId);
+  <div id="content">
+    <!-- 訂單列表 -->
+  </div>
 
-            // 顯示「延遲」按鈕
-            const laterBtn = document.getElementById("later_" + orderId);
-            laterBtn.classList.remove("hidden");
+  <script>
+    const orders = [
+      { id: 1, name: "牛肉麵", price: 180, image: "https://via.placeholder.com/150" },
+      { id: 2, name: "臭豆腐", price: 70, image: "https://via.placeholder.com/150" },
+      { id: 3, name: "珍珠奶茶", price: 60, image: "https://via.placeholder.com/150" }
+    ];
 
-            // 顯示「完成」按鈕
-            const finishBtn = document.getElementById("finish_" + orderId);
-            finishBtn.classList.remove("hidden");
+    const contentDiv = document.getElementById("content");
 
-            // 隱藏「接單」按鈕
-            const ticketBtn = document.getElementById("ticket_" + orderId);
-            ticketBtn.classList.add("hidden");
+    orders.forEach(order => {
+      const card = document.createElement("div");
+      card.classList.add("product-card");
 
-            // 進度條 (假設要做倒數示範)
-            const bar = document.getElementById("bar_" + orderId);
+      card.innerHTML = `
+        <img src="${order.image}" class="img-fluid mb-2" alt="${order.name}" />
+        <h5>${order.name}</h5>
+        <p>價格: $${order.price}</p>
+        
+        <div class="progress mb-2">
+          <div class="progress-bar bg-success" role="progressbar"></div>
+        </div>
 
-            function getRandomFloat(min, max) {
-                return Math.random() * (max - min) + min;
-            }
-            const randomFloatNum = getRandomFloat(600, 1200);
-            let counter = Math.floor(randomFloatNum);
+        <button class="btn btn-primary btn-receive">接單</button>
+        <button class="btn btn-warning btn-delay d-none">延遲</button>
+        <button class="btn btn-success btn-complete d-none">完成</button>
+        <p class="completed d-none">已完成</p>
+      `;
 
-            // 每秒減1直到0
-            const timerId = setInterval(() => {
-                counter--;
-                bar.style.width = counter + "px";
-                bar.textContent = Math.floor(counter / 60) + " min 剩餘";
+      const btnReceive = card.querySelector(".btn-receive");
+      const btnDelay = card.querySelector(".btn-delay");
+      const btnComplete = card.querySelector(".btn-complete");
+      const completedText = card.querySelector(".completed");
+      const progressBar = card.querySelector(".progress-bar");
 
-                if (counter <= 0) {
-                    clearInterval(timerId);
-                    console.log("倒數結束");
-                }
-            }, 1000);
-        }
+      let progress = 0;
+      let timer = null;
 
-        // 點擊「延遲」後的行為 => 回到接單狀態
-        function delayOrder(orderId) {
-            alert("已延遲此訂單，回到『可接單』狀態。");
+      btnReceive.addEventListener("click", () => {
+        btnReceive.classList.add("d-none");
+        btnDelay.classList.remove("d-none");
+        btnComplete.classList.remove("d-none");
 
-            // 顯示「接單」按鈕
-            const ticketBtn = document.getElementById("ticket_" + orderId);
-            ticketBtn.classList.remove("hidden");
+        progress = 0;
+        progressBar.style.width = "0%";
 
-            // 隱藏「延遲」與「完成」按鈕
-            const laterBtn = document.getElementById("later_" + orderId);
-            laterBtn.classList.add("hidden");
-            const finishBtn = document.getElementById("finish_" + orderId);
-            finishBtn.classList.add("hidden");
+        timer = setInterval(() => {
+          progress += 10;
+          progressBar.style.width = `${progress}%`;
+          if (progress >= 100) {
+            clearInterval(timer);
+          }
+        }, 1000);
+      });
 
-            // 進度條重置
-            const bar = document.getElementById("bar_" + orderId);
-            bar.style.width = "100%";
-            bar.textContent = "start";
-        }
+      btnComplete.addEventListener("click", () => {
+        clearInterval(timer);
+        progressBar.style.width = "100%";
+        btnDelay.classList.add("d-none");
+        btnComplete.classList.add("d-none");
+        completedText.classList.remove("d-none");
+      });
 
-        // 點擊「完成」後的行為 => 跳出「訂單完成」
-        function finishOrder(orderId) {
-            console.log("Order finished:", orderId);
-            alert("訂單完成");
+      btnDelay.addEventListener("click", () => {
+        clearInterval(timer);
+        progressBar.style.width = "0%";
+        btnReceive.classList.remove("d-none");
+        btnDelay.classList.add("d-none");
+        btnComplete.classList.add("d-none");
+      });
 
-            // 若想從畫面上移除這張卡片
-            // 也可以把這段註解打開
-            // const card = document.getElementById("card_" + orderId);
-            // card.remove();
-        }
+      contentDiv.appendChild(card);
+    });
+  </script>
 
-        // 模擬取得訂單資料
-        async function fetchOrders() {
-            try {
-                // 模擬資料
-                const orders = [
-                    {
-                        _id: "1111",
-                        userName: "Minny",
-                        items: [
-                            { menuId: "aaa", menuName: "薯條", quantity: 2 },
-                            { menuId: "bbb", menuName: "雞尾酒", quantity: 1 },
-                        ],
-                        amount: 300,
-                        avatar: "https://www.allrecipes.com/thmb/UsNtGp9OgIsKw6cPqGQ-CxLmnTE=/1500x0/filters:no_upscale()/AR-72657-best-hamburger-ever-ddmfs-4x3-hero-878e801ab30445988d007461782b3c25.jpg",
-                    },
-                    {
-                        _id: "2222",
-                        userName: "Apple",
-                        items: [
-                            { menuId: "ccc", menuName: "黑手黨燉飯", quantity: 2 },
-                            { menuId: "ddd", menuName: "愛德華.李豆腐地獄", quantity: 3 },
-                        ],
-                        amount: 2664,
-                        avatar: "https://www.allrecipes.com/thmb/j8P_iLs2Elic7jJGZRgjGmRCMuI=/1500x0/filters:no_upscale()/classic-burger-8f851c3051c648128fd2f47f7aa1ab9e.jpg"
-                    }
-                ];
-
-                const content = document.getElementById("content");
-                orders.forEach(order => {
-                    // 處理菜單名稱
-                    let menuName = "";
-                    order.items.forEach((item, index) => {
-                        if (index > 0) menuName += ", ";
-                        menuName += `${item.menuName || 'Unknown Item'} x ${item.quantity || 1}`;
-                    });
-
-                    const productCard = `
-                        <div id="card_${order._id}" class="product-card">
-                            <img src="${order.avatar}" alt="Product Image">
-                            <div class="card-content">
-                                <h3>${order.userName}</h3>
-                                <p>${menuName}</p>
-                                <div class="price">$${order.amount}</div>
-                                <!-- 進度條 -->
-                                <div style="width:60%;">
-                                    <div class="progress">
-                                        <div id="bar_${order._id}"
-                                             class="progress-bar bg-danger"
-                                             style="width: 100%;">
-                                             start
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="button-container">
-                                <button id="later_${order._id}" class="hidden"
-                                        style="background-color: #1ab9cf;"
-                                        onclick="delayOrder('${order._id}')">延遲</button>
-
-                                <button id="finish_${order._id}" class="hidden"
-                                        style="background-color: #c05656;"
-                                        onclick="finishOrder('${order._id}')">完成</button>
-
-                                <button id="ticket_${order._id}"
-                                        onclick="acceptOrder('${order._id}')">接單</button>
-                            </div>
-                        </div>
-                    `;
-                    content.innerHTML += productCard;
-                });
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-            }
-        }
-
-        // 初始化
-        fetchOrders();
-    </script>
 </body>
-
 </html>
